@@ -1,0 +1,91 @@
+{
+  "order": 6,
+  "title": "Wall Goblin",
+  "tagline": "+reward while the box is near the exit",
+  "description": "The exit is inside a room whose door faces away. 'Near' is measured in a straight line, straight through the wall.",
+  "env": {
+    "layout": "walled_exit",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "walled_exit",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "adversarial",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "steps": 800000,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "versions": [
+    {
+      "version": 1,
+      "title": "Near is good enough",
+      "description": "+0.1 per step while the box is within 2.5 m of the exit, distance shaping, +5 on completion.",
+      "reward": {
+        "name": "Near is good enough",
+        "components": {
+          "proximity": 0.1,
+          "distance_progress": 1.0,
+          "stable_goal": 5.0
+        },
+        "params": {
+          "proximity_radius": 2.5
+        },
+        "termination": {
+          "on_stable": true,
+          "on_hazard": true,
+          "max_steps": 300
+        }
+      }
+    },
+    {
+      "version": 2,
+      "title": "Drop the proximity bonus",
+      "description": "Remove the loophole but keep straight-line distance shaping and a completion bonus.",
+      "reward": {
+        "name": "Drop the proximity bonus",
+        "components": {
+          "distance_progress": 1.0,
+          "agent_box_progress": 0.3,
+          "stable_goal": 10.0,
+          "step_penalty": -0.01
+        },
+        "termination": {
+          "on_stable": true,
+          "on_hazard": true,
+          "max_steps": 300
+        }
+      }
+    },
+    {
+      "version": 3,
+      "title": "Measure distance along paths",
+      "description": "Replace straight-line shaping with walkable-path distance, which respects walls.",
+      "reward": {
+        "name": "Measure distance along paths",
+        "components": {
+          "agent_box_progress": 0.3,
+          "stable_goal": 10.0,
+          "step_penalty": -0.01,
+          "path_progress": 1.0
+        },
+        "termination": {
+          "on_stable": true,
+          "on_hazard": true,
+          "max_steps": 300
+        }
+      }
+    }
+  ]
+}

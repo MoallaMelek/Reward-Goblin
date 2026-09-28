@@ -1,0 +1,71 @@
+{
+  "order": 4,
+  "title": "Survival Goblin",
+  "tagline": "+0.1 every step it stays alive",
+  "description": "A survival bonus to keep the goblin away from lava. Finishing the task ends the bonus.",
+  "env": {
+    "layout": "lava_room",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "lava_room",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "adversarial",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "versions": [
+    {
+      "version": 1,
+      "title": "Stay alive",
+      "description": "+0.1 per step alive, progress shaping, +5 for completing, -1 for lava.",
+      "reward": {
+        "name": "Stay alive",
+        "components": {
+          "survival": 0.1,
+          "distance_progress": 1.0,
+          "stable_goal": 5.0,
+          "hazard_penalty": -1.0
+        },
+        "termination": {
+          "on_stable": true,
+          "on_hazard": true,
+          "max_steps": 300
+        }
+      }
+    },
+    {
+      "version": 2,
+      "title": "Time costs, lava hurts",
+      "description": "Drop the survival bonus; a small time penalty makes finishing early the best option; lava costs more than any episode can earn.",
+      "reward": {
+        "name": "Time costs, lava hurts",
+        "components": {
+          "distance_progress": 1.0,
+          "agent_box_progress": 0.3,
+          "stable_goal": 10.0,
+          "step_penalty": -0.01,
+          "hazard_penalty": -10.0
+        },
+        "termination": {
+          "on_stable": true,
+          "on_hazard": true,
+          "max_steps": 300
+        }
+      }
+    }
+  ],
+  "steps": 800000,
+  "seeds": [
+    1,
+    2,
+    3
+  ]
+}

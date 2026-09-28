@@ -1,0 +1,68 @@
+{
+  "order": 3,
+  "title": "Speed Goblin",
+  "tagline": "+reward for hurrying toward the exit",
+  "description": "Meant to discourage dawdling. It rewards the goblin's motion, not the box's.",
+  "env": {
+    "layout": "arena",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "arena",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "medium",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "versions": [
+    {
+      "version": 1,
+      "title": "Hurry up!",
+      "description": "Pays for goblin velocity toward the exit, plus +5 for a completed delivery.",
+      "reward": {
+        "name": "Hurry up!",
+        "components": {
+          "approach_speed": 0.3,
+          "stable_goal": 5.0
+        },
+        "termination": {
+          "on_stable": true,
+          "on_hazard": true,
+          "max_steps": 300
+        }
+      }
+    },
+    {
+      "version": 2,
+      "title": "Reward the box, not the goblin",
+      "description": "Replace the hurry bonus with a time penalty and box progress.",
+      "reward": {
+        "name": "Reward the box, not the goblin",
+        "components": {
+          "distance_progress": 1.0,
+          "agent_box_progress": 0.3,
+          "stable_goal": 10.0,
+          "step_penalty": -0.01
+        },
+        "termination": {
+          "on_stable": true,
+          "on_hazard": true,
+          "max_steps": 300
+        }
+      }
+    }
+  ],
+  "steps": 800000,
+  "seeds": [
+    1,
+    2,
+    3
+  ]
+}

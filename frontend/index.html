@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reward Goblin</title>
+  <meta name="description" content="Reward hacking made visible: a real PPO agent optimises your reward function, not your intention.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='18' r='11' fill='%236fd35a'/%3E%3Cpath d='M6 12 L1 4 L10 9Z M26 12 L31 4 L22 9Z' fill='%233c8f2c'/%3E%3Ccircle cx='12' cy='16' r='2.5' fill='%23000'/%3E%3Ccircle cx='20' cy='16' r='2.5' fill='%23000'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="18" r="11" fill="#6fd35a"/><path d="M6 12 L1 4 L10 9Z M26 12 L31 4 L22 9Z" fill="#3c8f2c"/><circle cx="12" cy="16" r="2.5" fill="#0b0e14"/><circle cx="20" cy="16" r="2.5" fill="#0b0e14"/><path d="M10 21 Q16 26 22 21" stroke="#0b0e14" stroke-width="2" fill="none"/></svg>
+      <div>
+        <h1>REWARD GOBLIN</h1>
+        <p class="tagline">The AI that does exactly what you asked.</p>
+      </div>
+    </div>
+    <p class="thesis">Tell the AI what you want using rewards. A real PPO agent will then optimise <em>the reward</em>, not <em>your intention</em>.</p>
+    <div class="hero-actions">
+      <label class="switch"><input type="checkbox" id="research-toggle"><span></span> Research mode</label>
+      <span class="server-state" id="server-state">connecting…</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- 1. pick an experiment -->
+  <section class="panel" id="gallery-section">
+    <div class="section-head">
+      <h2><span class="step-no">1</span> Task: move the box to the exit. Pick a reward.</h2>
+      <p class="muted">Each goblin was trained with PPO on the reward shown. None of the behaviour is scripted.</p>
+    </div>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <!-- 2. signature split screen -->
+  <section class="panel split-panel">
+    <div class="section-head row">
+      <h2><span class="step-no">2</span> <span id="exp-title">…</span></h2>
+      <div class="controls-inline">
+        <div class="seg" id="version-tabs" role="tablist" aria-label="Reward version"></div>
+        <select id="seed-select" aria-label="Training seed"></select>
+        <select id="replay-select" aria-label="Replay"></select>
+      </div>
+    </div>
+    <div class="split">
+      <div class="pane intended">
+        <div class="pane-label">WHAT YOU INTENDED</div>
+        <p class="objective" id="objective-text"></p>
+        <div class="canvas-wrap"><canvas id="left-canvas"></canvas></div>
+        <div class="pane-foot">
+          <ul class="checklist" id="checklist"></ul>
+          <div class="ref-note muted" id="ref-note"></div>
+        </div>
+      </div>
+      <div class="pane rewarded">
+        <div class="pane-label">WHAT YOU REWARDED</div>
+        <p class="objective" id="reward-text"></p>
+        <div class="canvas-wrap">
+          <canvas id="right-canvas"></canvas>
+          <div class="exploit-flag" id="exploit-flag" hidden>⚠ POSSIBLE REWARD EXPLOIT</div>
+          <div class="hud" id="hud"></div>
+        </div>
+        <div class="pane-foot">
+          <pre class="breakdown" id="breakdown"></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="transport">
+      <button class="btn icon" id="play-btn" aria-label="Play">▶</button>
+      <div class="timeline" id="timeline" aria-label="Timeline"></div>
+      <select id="speed-select" aria-label="Playback speed">
+        <option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option>
+      </select>
+      <span class="frame-no" id="frame-no">0</span>
+    </div>
+
+    <div class="scoreboard">
+      <div class="score">
+        <div class="score-label">Reward score</div>
+        <div class="score-value" id="score-reward">–</div>
+        <div class="score-sub" id="score-reward-sub"></div>
+      </div>
+      <div class="score">
+        <div class="score-label">Actual task success</div>
+        <div class="score-value" id="score-true">–</div>
+        <div class="score-sub" id="score-true-sub"></div>
+      </div>
+      <div class="score wide">
+        <div class="score-label">Exploit detector</div>
+        <div class="score-value small" id="score-exploit">–</div>
+        <div class="score-sub" id="score-exploit-sub"></div>
+      </div>
+    </div>
+    <details class="events">
+      <summary>Event log</summary>
+      <ol id="event-list"></ol>
+    </details>
+  </section>
+
+  <!-- 3. reward editor + training -->
+  <section class="panel two-col">
+    <div class="col">
+      <div class="section-head">
+        <h2><span class="step-no">3</span> Reward function</h2>
+        <p class="muted">Assembled from fixed components. No code is executed.</p>
+      </div>
+      <div id="reward-editor"></div>
+    </div>
+    <div class="col">
+      <div class="section-head">
+        <h2><span class="step-no">4</span> Train the goblin</h2>
+        <p class="muted" id="train-hint">Trains PPO on your reward across several random seeds, then evaluates on held-out layouts.</p>
+      </div>
+      <div class="train-box">
+        <div class="field-row">
+          <label>Layout <select id="layout-select"></select></label>
+          <label>Steps <input type="number" id="steps-input" min="10000" max="500000" step="10000" value="150000"></label>
+          <label>Seeds <input type="text" id="seeds-input" value="1, 2, 3" aria-describedby="seeds-help"></label>
+        </div>
+        <div id="research-fields" class="research-only"></div>
+        <button class="btn primary big" id="train-btn">TRAIN GOBLIN</button>
+        <div class="job" id="job-status" hidden></div>
+      </div>
+      <div class="lint" id="lint"></div>
+    </div>
+  </section>
+
+  <!-- 5. seeds -->
+  <section class="panel">
+    <div class="section-head">
+      <h2><span class="step-no">5</span> Seed comparison</h2>
+      <p class="muted">Same reward, different random seeds. Deterministic policy, 20 held-out start states each. <b>Reward return ≠ task success.</b></p>
+    </div>
+    <div class="table-wrap"><table class="data" id="seed-table"></table></div>
+  </section>
+
+  <!-- 6. did the fix work -->
+  <section class="panel">
+    <div class="section-head">
+      <h2><span class="step-no">6</span> Did the fix actually work?</h2>
+      <p class="muted">Every reward version, pooled over all training seeds. Evaluated on held-out start states <em>and</em> on unseen procedural layouts. One clean replay proves nothing.</p>
+    </div>
+    <div class="versions" id="versions"></div>
+  </section>
+
+  <!-- 7. training metrics -->
+  <section class="panel">
+    <div class="section-head row">
+      <div>
+        <h2><span class="step-no">7</span> Training metrics</h2>
+        <p class="muted">Recorded during training (stochastic policy, episodes finished in each rollout) for the selected version. Not smoothed, not simulated.</p>
+      </div>
+    </div>
+    <div class="charts" id="charts"></div>
+  </section>
+
+  <!-- 8. exploit analysis -->
+  <section class="panel two-col">
+    <div class="col">
+      <div class="section-head"><h2><span class="step-no">8</span> Exploit analysis: this replay</h2></div>
+      <div id="findings"></div>
+    </div>
+    <div class="col">
+      <div class="section-head"><h2>How the detectors work</h2></div>
+      <div class="detector-help muted" id="detector-help"></div>
+    </div>
+  </section>
+
+  <section class="panel research-only" id="research-panel">
+    <div class="section-head row">
+      <h2>Experiment metadata</h2>
+      <div class="controls-inline">
+        <button class="btn" id="dl-meta">Download run JSON</button>
+        <button class="btn" id="dl-replay">Download replay JSON</button>
+      </div>
+    </div>
+    <pre class="json" id="meta-json"></pre>
+  </section>
+</main>
+
+<footer class="foot muted">
+  Reward Goblin · Gymnasium + Stable-Baselines3 + Pymunk · exploit labels are heuristic diagnostics, not proofs.
+</footer>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>

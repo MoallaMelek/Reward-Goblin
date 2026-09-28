@@ -1,0 +1,67 @@
+{
+  "order": 2,
+  "title": "Distance Goblin",
+  "tagline": "+1 whenever the box gets closer",
+  "description": "Rewarding progress sounds safe. Rewarding only the good half of progress is not.",
+  "env": {
+    "layout": "arena",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "arena",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "medium",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "versions": [
+    {
+      "version": 1,
+      "title": "Closer is better",
+      "description": "Pays for every centimetre the box gets closer. Moving it away is free.",
+      "reward": {
+        "name": "Closer is better",
+        "components": {
+          "closer_bonus": 1.0
+        },
+        "termination": {
+          "on_stable": true,
+          "on_hazard": true,
+          "max_steps": 300
+        }
+      }
+    },
+    {
+      "version": 2,
+      "title": "Signed progress + completion",
+      "description": "Charge for moving away too (potential-based shaping), and pay for resting inside.",
+      "reward": {
+        "name": "Signed progress + completion",
+        "components": {
+          "distance_progress": 1.0,
+          "agent_box_progress": 0.3,
+          "stable_goal": 10.0,
+          "step_penalty": -0.01
+        },
+        "termination": {
+          "on_stable": true,
+          "on_hazard": true,
+          "max_steps": 300
+        }
+      }
+    }
+  ],
+  "steps": 800000,
+  "seeds": [
+    1,
+    2,
+    3
+  ]
+}
