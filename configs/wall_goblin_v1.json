@@ -1,0 +1,44 @@
+{
+  "experiment": "wall_goblin",
+  "version": 1,
+  "title": "Near is good enough",
+  "description": "+0.1 per step while the box is within 2.5 m of the exit, distance shaping, +5 on completion.",
+  "reward": {
+    "name": "Near is good enough",
+    "components": {
+      "proximity": 0.1,
+      "distance_progress": 1.0,
+      "stable_goal": 5.0
+    },
+    "params": {
+      "proximity_radius": 2.5
+    },
+    "termination": {
+      "on_stable": true,
+      "on_hazard": true,
+      "max_steps": 300
+    }
+  },
+  "env": {
+    "layout": "walled_exit",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "walled_exit",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "adversarial",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "algo": {
+    "name": "PPO"
+  },
+  "steps": 800000
+}

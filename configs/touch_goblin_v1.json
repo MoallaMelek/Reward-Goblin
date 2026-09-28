@@ -1,0 +1,41 @@
+{
+  "experiment": "touch_goblin",
+  "version": 1,
+  "title": "Touch the exit",
+  "description": "Pays +5 every time the box starts touching the exit. Safe distance shaping helps the goblin find it.",
+  "reward": {
+    "name": "Touch the exit",
+    "components": {
+      "goal_entry": 5.0,
+      "distance_progress": 1.0,
+      "step_penalty": -0.01
+    },
+    "termination": {
+      "on_stable": true,
+      "on_hazard": true,
+      "max_steps": 300
+    }
+  },
+  "env": {
+    "layout": "exit_pad",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "exit_pad",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "medium",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "algo": {
+    "name": "PPO"
+  },
+  "steps": 800000
+}

@@ -1,0 +1,42 @@
+{
+  "experiment": "touch_goblin",
+  "version": 3,
+  "title": "Reward completion",
+  "description": "Pay for the outcome: +10 once the box has rested inside for 30 frames; keep only potential-based shaping.",
+  "reward": {
+    "name": "Reward completion",
+    "components": {
+      "distance_progress": 1.0,
+      "agent_box_progress": 0.3,
+      "stable_goal": 10.0,
+      "step_penalty": -0.01
+    },
+    "termination": {
+      "on_stable": true,
+      "on_hazard": true,
+      "max_steps": 300
+    }
+  },
+  "env": {
+    "layout": "exit_pad",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "exit_pad",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "medium",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "algo": {
+    "name": "PPO"
+  },
+  "steps": 800000
+}

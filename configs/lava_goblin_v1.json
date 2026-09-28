@@ -1,0 +1,41 @@
+{
+  "experiment": "lava_goblin",
+  "version": 1,
+  "title": "Every second counts",
+  "description": "-0.05 per step, +3 for completing, -1 for touching lava (which ends the episode).",
+  "reward": {
+    "name": "Every second counts",
+    "components": {
+      "step_penalty": -0.05,
+      "stable_goal": 3.0,
+      "hazard_penalty": -1.0
+    },
+    "termination": {
+      "on_stable": true,
+      "on_hazard": true,
+      "max_steps": 300
+    }
+  },
+  "env": {
+    "layout": "lava_room",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "lava_room",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "adversarial",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "algo": {
+    "name": "PPO"
+  },
+  "steps": 800000
+}

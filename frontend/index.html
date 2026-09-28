@@ -181,6 +181,12 @@
         <button class="btn" id="dl-replay">Download replay JSON</button>
       </div>
     </div>
+    <div class="field-row" style="margin-bottom:10px">
+      <label>Evaluate the selected seed on <select id="eval-layout"></select></label>
+      <label>Episodes <input type="number" id="eval-episodes" min="1" max="50" value="20"></label>
+      <label>&nbsp;<button class="btn" id="eval-btn">Run evaluation</button></label>
+    </div>
+    <div id="eval-result" class="muted" style="font-size:.85rem;margin-bottom:10px"></div>
     <pre class="json" id="meta-json"></pre>
   </section>
 </main>

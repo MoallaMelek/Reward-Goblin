@@ -1,0 +1,42 @@
+{
+  "experiment": "touch_goblin",
+  "version": 2,
+  "title": "Keep touching it",
+  "description": "Patch: pay every step the box touches the exit and end the episode once it is fully inside.",
+  "reward": {
+    "name": "Keep touching it",
+    "components": {
+      "goal_contact": 0.2,
+      "distance_progress": 1.0,
+      "step_penalty": -0.01
+    },
+    "termination": {
+      "on_inside": true,
+      "on_stable": false,
+      "on_hazard": true,
+      "max_steps": 300
+    }
+  },
+  "env": {
+    "layout": "exit_pad",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "exit_pad",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "medium",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "algo": {
+    "name": "PPO"
+  },
+  "steps": 800000
+}

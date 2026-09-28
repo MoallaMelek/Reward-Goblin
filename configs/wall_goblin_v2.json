@@ -1,0 +1,42 @@
+{
+  "experiment": "wall_goblin",
+  "version": 2,
+  "title": "Drop the proximity bonus",
+  "description": "Remove the loophole but keep straight-line distance shaping and a completion bonus.",
+  "reward": {
+    "name": "Drop the proximity bonus",
+    "components": {
+      "distance_progress": 1.0,
+      "agent_box_progress": 0.3,
+      "stable_goal": 10.0,
+      "step_penalty": -0.01
+    },
+    "termination": {
+      "on_stable": true,
+      "on_hazard": true,
+      "max_steps": 300
+    }
+  },
+  "env": {
+    "layout": "walled_exit",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "walled_exit",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "adversarial",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "algo": {
+    "name": "PPO"
+  },
+  "steps": 800000
+}

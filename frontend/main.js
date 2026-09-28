@@ -1,4 +1,4 @@
-import { api } from "./components/api.js";
+import { api, STATIC } from "./components/api.js";
 import { lineChart, SERIES, compact } from "./charts/lineChart.js";
 import { Player, ACTIONS, eventList } from "./replay/player.js";
 import { RewardEditor, describeReward } from "./rewards/editor.js";
@@ -58,10 +58,11 @@ async function boot() {
   $("train-btn").addEventListener("click", startTraining);
   $("dl-meta").addEventListener("click", () => S.runDetail && download(`${S.run}.json`, S.runDetail));
   $("dl-replay").addEventListener("click", () => S.rec && download(`${S.run}_${S.rec.kind}.json`, S.rec));
+  $("eval-btn").addEventListener("click", runEvaluation);
 
   try {
     S.meta = await api.meta();
-    $("server-state").textContent = `backend ok · ${S.meta.env_version}`;
+    $("server-state").textContent = STATIC ? `static demo · ${S.meta.env_version}` : `backend ok · ${S.meta.env_version}`;
     $("server-state").className = "server-state ok";
   } catch (e) {
     $("server-state").textContent = "backend offline: start uvicorn backend.api.main:app";
@@ -74,6 +75,12 @@ async function boot() {
     ...S.meta.difficulties.map((d) => `<option value="${d}">random: ${d}</option>`)].join("");
   renderResearchFields();
   renderDetectorHelp();
+  $("eval-layout").innerHTML = $("layout-select").innerHTML;
+  if (STATIC) {
+    $("train-btn").disabled = true;
+    $("train-btn").textContent = "TRAINING NEEDS THE LOCAL BACKEND";
+    $("train-hint").textContent = "This is a static snapshot of the pre-trained gallery. Clone the repo and run the FastAPI backend to edit rewards and train your own goblins.";
+  }
 
   const ex = await api.experiments();
   S.gallery = ex.gallery;
@@ -405,16 +412,27 @@ async function renderCharts(liveRuns = null) {
 }
 
 // ------------------------------------------------------------------ editor, lint, training
+function canonical(r) {
+  const sort = (o) => Object.fromEntries(Object.entries(o || {}).sort(([a], [b]) => a.localeCompare(b)));
+  return JSON.stringify([sort(r.components), sort(r.params), sort(r.termination)]);
+}
+
 async function onRewardChange(cfg) {
   try {
-    const v = await api.validate(cfg);
+    const h = S.exp && currentHist();
+    const unchanged = h && canonical(h.reward) === canonical(cfg);
+    const v = await api.validate(cfg, unchanged ? h.reward_fingerprint : null);
+    if (v.offline) {
+      $("lint").innerHTML = `<div class="lint-ok" style="color:var(--muted)">Lint for edited rewards needs the local backend.</div>`;
+      return;
+    }
     const lint = $("lint");
     if (!v.ok) {
       lint.innerHTML = `<div class="errors">${v.errors.map(esc).join("<br>")}</div>`;
       $("train-btn").disabled = true;
       return;
     }
-    $("train-btn").disabled = !!(S.job && S.job.state !== "done" && S.job.state !== "error");
+    $("train-btn").disabled = STATIC || !!(S.job && S.job.state !== "done" && S.job.state !== "error");
     lint.innerHTML = v.warnings.length
       ? `<div class="lint-title">The goblin is eyeing these loopholes (static lint)</div>` +
         v.warnings.map((w) => `<div class="lint-item ${w.severity}"><b>${w.severity}</b> · ${esc(w.message)}</div>`).join("")
@@ -504,6 +522,20 @@ async function pollJob() {
     } else {
       toast(`Training ${j.state}. See the seed rows for details.`);
     }
+  }
+}
+
+async function runEvaluation() {
+  if (!S.run) return;
+  const out = $("eval-result");
+  out.textContent = "Evaluating (deterministic policy, fresh layouts)…";
+  try {
+    const r = await api.evaluate(S.run, $("eval-layout").value, parseInt($("eval-episodes").value, 10));
+    const s = r.summary;
+    out.innerHTML = `<b>${esc(S.run)}</b> on <b>${esc(r.layout)}</b> · ${s.episodes} episodes · true success <b>${pct(s.true_success_rate)}</b> · exploit rate <b>${pct(s.exploit_rate)}</b> · mean reward <b>${num(s.mean_return)}</b> (intended ${num(s.mean_reference_return)})` +
+      (s.dominant_exploit ? ` · most common: ${esc(S.meta.exploit_labels[s.dominant_exploit])}` : "");
+  } catch (e) {
+    out.textContent = e.message;
   }
 }
 

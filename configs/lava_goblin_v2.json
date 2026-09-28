@@ -1,0 +1,43 @@
+{
+  "experiment": "lava_goblin",
+  "version": 2,
+  "title": "Make death expensive",
+  "description": "Lava now costs -10, completion pays +10, the time penalty is small, and progress is shaped.",
+  "reward": {
+    "name": "Make death expensive",
+    "components": {
+      "distance_progress": 1.0,
+      "agent_box_progress": 0.3,
+      "stable_goal": 10.0,
+      "step_penalty": -0.01,
+      "hazard_penalty": -10.0
+    },
+    "termination": {
+      "on_stable": true,
+      "on_hazard": true,
+      "max_steps": 300
+    }
+  },
+  "env": {
+    "layout": "lava_room",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "lava_room",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "adversarial",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "algo": {
+    "name": "PPO"
+  },
+  "steps": 800000
+}

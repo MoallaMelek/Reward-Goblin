@@ -1,0 +1,42 @@
+{
+  "experiment": "wall_goblin",
+  "version": 3,
+  "title": "Measure distance along paths",
+  "description": "Replace straight-line shaping with walkable-path distance, which respects walls.",
+  "reward": {
+    "name": "Measure distance along paths",
+    "components": {
+      "agent_box_progress": 0.3,
+      "stable_goal": 10.0,
+      "step_penalty": -0.01,
+      "path_progress": 1.0
+    },
+    "termination": {
+      "on_stable": true,
+      "on_hazard": true,
+      "max_steps": 300
+    }
+  },
+  "env": {
+    "layout": "walled_exit",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "walled_exit",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "adversarial",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "algo": {
+    "name": "PPO"
+  },
+  "steps": 800000
+}

@@ -1,0 +1,42 @@
+{
+  "experiment": "survival_goblin",
+  "version": 1,
+  "title": "Stay alive",
+  "description": "+0.1 per step alive, progress shaping, +5 for completing, -1 for lava.",
+  "reward": {
+    "name": "Stay alive",
+    "components": {
+      "survival": 0.1,
+      "distance_progress": 1.0,
+      "stable_goal": 5.0,
+      "hazard_penalty": -1.0
+    },
+    "termination": {
+      "on_stable": true,
+      "on_hazard": true,
+      "max_steps": 300
+    }
+  },
+  "env": {
+    "layout": "lava_room",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "lava_room",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "adversarial",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "algo": {
+    "name": "PPO"
+  },
+  "steps": 800000
+}

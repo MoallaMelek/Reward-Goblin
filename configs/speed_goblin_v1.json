@@ -1,0 +1,40 @@
+{
+  "experiment": "speed_goblin",
+  "version": 1,
+  "title": "Hurry up!",
+  "description": "Pays for goblin velocity toward the exit, plus +5 for a completed delivery.",
+  "reward": {
+    "name": "Hurry up!",
+    "components": {
+      "approach_speed": 0.3,
+      "stable_goal": 5.0
+    },
+    "termination": {
+      "on_stable": true,
+      "on_hazard": true,
+      "max_steps": 300
+    }
+  },
+  "env": {
+    "layout": "arena",
+    "randomize": true
+  },
+  "eval": [
+    {
+      "name": "in_distribution",
+      "layout": "arena",
+      "episodes": 20,
+      "offset": 0
+    },
+    {
+      "name": "shifted",
+      "layout": "medium",
+      "episodes": 20,
+      "offset": 5000
+    }
+  ],
+  "algo": {
+    "name": "PPO"
+  },
+  "steps": 800000
+}
