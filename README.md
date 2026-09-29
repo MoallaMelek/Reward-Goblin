@@ -267,6 +267,10 @@ uvicorn backend.api.main:app --port 8000
 
 Toggle **Research mode** for PPO/A2C hyper-parameters, run metadata, JSON downloads and on-demand evaluation on any layout suite.
 
+### Windows executable
+
+`scripts/build_exe.ps1` packages the whole app, including PyTorch CPU and training, into a one-folder PyInstaller build. Double-click `RewardGoblin.exe`: it starts the backend on a free local port and opens the UI in your browser. Close the console window to stop it. Runs you train are saved in the `data` folder next to the exe. Build it from an isolated venv and keep the output on a short path (the default is `%USERPROFILE%\RewardGoblin`). Set `REWARD_GOBLIN_NO_BROWSER=1` to skip opening the browser.
+
 A backend-free snapshot of the gallery (for GitHub Pages or any static host) can be built with `python scripts/export_static.py`. Training is disabled there.
 
 ### API

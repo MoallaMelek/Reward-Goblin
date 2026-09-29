@@ -28,7 +28,7 @@ from .jobs import JobManager
 from .store import SAFE_ID, Store
 
 DATA_ROOT = Path(os.environ.get("REWARD_GOBLIN_ROOT", ROOT))
-FRONTEND = ROOT / "frontend"
+FRONTEND = Path(os.environ.get("REWARD_GOBLIN_FRONTEND", ROOT / "frontend"))
 MAX_API_STEPS = 500_000
 MAX_SEEDS = 8
 
