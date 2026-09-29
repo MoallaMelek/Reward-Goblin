@@ -26,7 +26,7 @@ const live = {
   run: (id) => request("GET", `/api/runs/${enc(id)}`),
   runMetrics: (id) => request("GET", `/api/runs/${enc(id)}/metrics`),
   replay: (id, kind) => request("GET", `/api/replays/${enc(id)}?kind=${enc(kind)}`),
-  validate: (reward) => request("POST", "/api/rewards/validate", { reward }),
+  validate: (reward, fingerprint, layout) => request("POST", "/api/rewards/validate", { reward, layout }),
   train: (config, seeds, steps) => request("POST", "/api/train", { config, seeds, steps }),
   job: (id) => request("GET", `/api/training/${enc(id)}`),
   jobMetrics: (id) => request("GET", `/api/training/${enc(id)}/metrics`),

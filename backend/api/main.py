@@ -45,8 +45,17 @@ async def lifespan(app):
 app = FastAPI(title="Reward Goblin", version="1.0", lifespan=lifespan)
 
 
+@app.middleware("http")
+async def revalidate(request, call_next):
+    # Frontend modules change during development; make browsers revalidate instead of caching.
+    response = await call_next(request)
+    response.headers.setdefault("Cache-Control", "no-cache")
+    return response
+
+
 class RewardBody(BaseModel):
     reward: dict
+    layout: str | None = None
 
 
 class TrainBody(BaseModel):
@@ -75,7 +84,7 @@ def meta():
 
 @app.post("/api/rewards/validate")
 def validate_reward(body: RewardBody):
-    errors, warnings = validate(body.reward)
+    errors, warnings = validate(body.reward, body.layout)
     out = {"ok": not errors, "errors": errors, "warnings": warnings}
     if not errors:
         cfg = RewardConfig.from_dict(body.reward)

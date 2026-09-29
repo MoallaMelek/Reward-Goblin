@@ -52,6 +52,7 @@ async function boot() {
       $("play-btn").click();
     }
   });
+  $("layout-select").addEventListener("change", () => editor && onRewardChange(editor.get()));
   $("research-toggle").addEventListener("change", (e) => document.body.classList.toggle("research", e.target.checked));
   $("seed-select").addEventListener("change", (e) => selectRun(e.target.value));
   $("replay-select").addEventListener("change", (e) => loadReplay(e.target.value));
@@ -88,6 +89,10 @@ async function boot() {
   const want = new URLSearchParams(location.hash.slice(1)).get("exp");
   const first = want || (S.gallery.find((g) => g.results && g.results.length) || S.gallery[0] || {}).id || ex.user_experiments[0];
   if (first) await selectExperiment(first);
+  window.addEventListener("hashchange", () => {
+    const id = new URLSearchParams(location.hash.slice(1)).get("exp");
+    if (id && (!S.exp || id !== S.exp.id)) selectExperiment(id);
+  });
 }
 
 // ------------------------------------------------------------------ gallery
@@ -142,7 +147,7 @@ async function selectVersion(v) {
   $("layout-select").value = h.env.layout;
   setResearchFields(h.algo);
   onRewardChange(editor.get());
-  renderRewardText(h.reward);
+  renderRewardText(h.reward, h.env.layout);
   const done = h.runs.filter((r) => r.state === "done");
   $("seed-select").innerHTML = done.map((r) => `<option value="${r.run_id}">seed ${r.seed}</option>`).join("");
   renderSeedTable();
@@ -188,8 +193,8 @@ async function loadReplay(kind) {
 }
 
 // ------------------------------------------------------------------ split screen
-function renderRewardText(reward) {
-  const d = describeReward(reward, S.meta);
+function renderRewardText(reward, layout) {
+  const d = describeReward(reward, S.meta, layout);
   $("reward-text").innerHTML = `${d.terms.map(esc).join(" · ")}<br><span class="muted">ends: ${d.ends.map(esc).join(" / ")}</span>`;
 }
 
@@ -325,7 +330,7 @@ function renderVersions() {
   const labels = S.meta.exploit_labels;
   const hist = S.exp.history;
   $("versions").innerHTML = hist.map((h, idx) => {
-    const d = describeReward(h.reward, S.meta);
+    const d = describeReward(h.reward, S.meta, h.env.layout);
     const suites = ["in_distribution", "shifted"].filter((k) => h.suites[k]).map((k) => {
       const s = h.suites[k];
       const title = k === "in_distribution" ? `Held-out starts · ${s.layout}` : `Unseen layouts · ${s.layout}`;
@@ -421,7 +426,7 @@ async function onRewardChange(cfg) {
   try {
     const h = S.exp && currentHist();
     const unchanged = h && canonical(h.reward) === canonical(cfg);
-    const v = await api.validate(cfg, unchanged ? h.reward_fingerprint : null);
+    const v = await api.validate(cfg, unchanged ? h.reward_fingerprint : null, $("layout-select").value);
     if (v.offline) {
       $("lint").innerHTML = `<div class="lint-ok" style="color:var(--muted)">Lint for edited rewards needs the local backend.</div>`;
       return;

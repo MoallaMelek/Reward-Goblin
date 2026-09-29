@@ -199,17 +199,20 @@ def main():
     store = Store(ROOT)
     DOCS.mkdir(exist_ok=True)
     for exp, v, kind, name, title in [
-        ("touch_goblin", 2, "worst_exploit", "demo_touch.gif", "Touch Goblin v2: +0.2 every step the box touches the exit"),
+        ("edge_goblin", 1, "worst_exploit", "demo_edge.gif", "Edge Goblin v1: +0.2 every step the box touches the exit"),
+        ("touch_goblin", 1, "worst_exploit", "demo_touch.gif", "Touch Goblin v1: +5 each time the box touches the exit"),
+        ("distance_goblin", 1, "worst_exploit", "demo_distance.gif", "Distance Goblin v1: +1 whenever the box gets closer"),
         ("speed_goblin", 1, "worst_exploit", "demo_speed.gif", "Speed Goblin v1: reward for hurrying toward the exit"),
         ("wall_goblin", 1, "worst_exploit", "demo_wall.gif", "Wall Goblin v1: reward while the box is 'near' the exit"),
         ("lava_goblin", 1, "worst_exploit", "demo_lava.gif", "Lava Goblin v1: -0.05 per step"),
-        ("touch_goblin", 3, "best_true_success", "demo_fixed.gif", "Touch Goblin v3: reward completion instead"),
+        ("edge_goblin", 2, "best_true_success", "demo_fixed.gif", "Edge Goblin v2: reward completion instead"),
     ]:
         rid = pick(store, exp, v, kind)
         if rid:
             make_gif(store, rid, kind, DOCS / name, title)
     results_figure(store, DOCS / "results.png")
-    training_figure(store, "touch_goblin", DOCS / "touch_training.png")
+    training_figure(store, "edge_goblin", DOCS / "edge_training.png")
+    training_figure(store, "wall_goblin", DOCS / "wall_training.png")
 
 
 if __name__ == "__main__":

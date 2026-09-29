@@ -42,7 +42,7 @@ def main():
         exp = api.experiment(e["id"])
         dump(f"experiments/{e['id']}.json", exp)
         for h in exp["history"]:
-            _, warnings = validate(h["reward"])
+            _, warnings = validate(h["reward"], h["env"]["layout"])
             lint[h["reward_fingerprint"]] = {"ok": True, "errors": [], "warnings": warnings}
             for r in h["runs"]:
                 rid = r["run_id"]

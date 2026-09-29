@@ -135,7 +135,7 @@ export class RewardEditor {
 }
 
 // One-line human description of a reward, shown on the right pane and on cards.
-export function describeReward(reward, meta) {
+export function describeReward(reward, meta, layout = null) {
   const parts = [];
   const c = reward.components || {};
   const frames = (reward.params || {}).stable_goal_frames ?? 30;
@@ -163,7 +163,8 @@ export function describeReward(reward, meta) {
   if (t.on_contact) ends.push("box touches exit");
   if (t.on_inside) ends.push("box fully inside");
   if (t.on_stable) ends.push(`box stable ${frames} frames`);
-  if (t.on_hazard) ends.push("lava");
+  const lava = !layout || ["lava_room", "adversarial"].includes(layout);
+  if (t.on_hazard && lava) ends.push("lava");
   ends.push(`${t.max_steps ?? 300} steps`);
   return { terms: parts, ends };
 }

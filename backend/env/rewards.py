@@ -189,7 +189,7 @@ def _split(d: dict) -> tuple[dict, dict, dict]:
     return comps, params, term
 
 
-def validate(d: dict) -> tuple[list[str], list[dict]]:
+def validate(d: dict, layout: str | None = None) -> tuple[list[str], list[dict]]:
     """Returns (errors, lint warnings). Errors make the config unusable."""
     errors: list[str] = []
     if not isinstance(d, dict):
@@ -228,11 +228,15 @@ def validate(d: dict) -> tuple[list[str], list[dict]]:
         errors.append("enable at least one reward component")
     if errors:
         return errors, []
-    return [], lint(RewardConfig(components=comps, params=params, termination=term))
+    return [], lint(RewardConfig(components=comps, params=params, termination=term), layout)
 
 
-def lint(cfg: RewardConfig) -> list[dict]:
-    """Static heuristics: which loopholes a goblin is likely to find. Not a proof of anything."""
+LAVA_LAYOUTS = ("lava_room", "adversarial")
+
+
+def lint(cfg: RewardConfig, layout: str | None = None) -> list[dict]:
+    """Static heuristics: which loopholes a goblin is likely to find. Not a proof of anything.
+    ``layout`` (optional) suppresses lava warnings on maps without lava."""
     c, t = cfg.components, cfg.termination
     w: list[dict] = []
 
@@ -267,7 +271,8 @@ def lint(cfg: RewardConfig) -> list[dict]:
         add("stalling_pays", "high" if income > c.get("stable_goal", 0) else "medium",
             f"A positive per-step reward (up to {income:.1f} per episode) stops the moment the task is done. "
             f"Completion pays {c.get('stable_goal', 0):.1f}. Procrastination may be optimal.")
-    if c.get("step_penalty", 0) < 0 and t["on_hazard"]:
+    has_lava = layout is None or layout in LAVA_LAYOUTS
+    if c.get("step_penalty", 0) < 0 and t["on_hazard"] and has_lava:
         worst_life = abs(c["step_penalty"]) * cfg.max_steps
         death = abs(min(0.0, c.get("hazard_penalty", 0)))
         if worst_life > death:

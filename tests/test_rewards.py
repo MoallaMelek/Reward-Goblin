@@ -108,6 +108,12 @@ def test_lint_flags_known_loopholes():
                          "early_exit_cheaper", "no_completion_reward"}
 
 
+def test_lava_warning_only_on_maps_with_lava():
+    c = RewardConfig(components={"step_penalty": -0.05, "hazard_penalty": -1.0})
+    assert "early_exit_cheaper" in {w["code"] for w in lint(c, "lava_room")}
+    assert "early_exit_cheaper" not in {w["code"] for w in lint(c, "arena")}
+
+
 def test_catalogue_metadata_is_complete():
     for k, v in COMPONENTS.items():
         assert {"label", "group", "default", "unit", "description"} <= v.keys(), k

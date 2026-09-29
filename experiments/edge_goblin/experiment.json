@@ -1,8 +1,8 @@
 {
-  "order": 4,
-  "title": "Speed Goblin",
-  "tagline": "+reward for hurrying toward the exit",
-  "description": "Meant to discourage dawdling. It rewards the goblin's motion, not the box's.",
+  "order": 2,
+  "title": "Edge Goblin",
+  "tagline": "+0.2 every step the box touches the exit",
+  "description": "Contact pays every step, and the episode ends once the box is fully inside. So: never go fully inside.",
   "env": {
     "layout": "arena",
     "randomize": true
@@ -21,19 +21,27 @@
       "offset": 5000
     }
   ],
+  "steps": 800000,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
   "versions": [
     {
       "version": 1,
-      "title": "Hurry up!",
-      "description": "Pays for goblin velocity toward the exit, plus +5 for a completed delivery.",
+      "title": "Keep touching it",
+      "description": "+0.2 every step the box overlaps the exit, distance shaping, episode ends when the box is fully inside.",
       "reward": {
-        "name": "Hurry up!",
+        "name": "Keep touching it",
         "components": {
-          "approach_speed": 0.3,
-          "stable_goal": 5.0
+          "goal_contact": 0.2,
+          "distance_progress": 1.0,
+          "step_penalty": -0.01
         },
         "termination": {
-          "on_stable": true,
+          "on_inside": true,
+          "on_stable": false,
           "on_hazard": true,
           "max_steps": 300
         }
@@ -41,10 +49,10 @@
     },
     {
       "version": 2,
-      "title": "Reward the box, not the goblin",
-      "description": "Replace the hurry bonus with a time penalty and box progress.",
+      "title": "Reward completion",
+      "description": "Pay once for the outcome (box resting inside for 30 frames); keep only potential-based shaping.",
       "reward": {
-        "name": "Reward the box, not the goblin",
+        "name": "Reward completion",
         "components": {
           "distance_progress": 1.0,
           "agent_box_progress": 0.3,
@@ -58,11 +66,5 @@
         }
       }
     }
-  ],
-  "steps": 800000,
-  "seeds": [
-    1,
-    2,
-    3
   ]
 }
