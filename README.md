@@ -227,7 +227,7 @@ The full per-seed table is in [docs/RESULTS.md](docs/RESULTS.md). The scripted r
 ## Installation
 
 ```bash
-git clone <this repo> reward-goblin && cd reward-goblin
+git clone https://github.com/MoallaMelek/Reward-Goblin.git && cd Reward-Goblin
 python -m venv .venv && . .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 pytest                                             # 55 tests: env checker, rewards, detectors, API, replays
