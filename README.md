@@ -313,6 +313,19 @@ reward-goblin/
 └── docs/               GIFs and figures
 ```
 
+<!-- certifications:start -->
+## Relevant Certifications
+
+Related training completed by **Melek Moalla**, with the connection to this project stated below.
+
+<a href="https://learn.nvidia.com/certificates?id=nQezqvF2S3GIgeoy1hNHKw"><img width="360" src="assets/certifications/nvidia-deep-learning.svg" alt="NVIDIA: Fundamentals of Deep Learning" /></a>
+
+**NVIDIA · Fundamentals of Deep Learning**  
+Related to the neural policies trained through Stable-Baselines3 PPO/A2C, reproducible training, and held-out evaluation.  
+[Verify / issuer record](https://learn.nvidia.com/certificates?id=nQezqvF2S3GIgeoy1hNHKw) · [Original PDF](https://github.com/MoallaMelek/MoallaMelek/blob/master/certificates/nvidia-deep-learning.pdf)
+
+<!-- certifications:end -->
+
 ## Future work
 
 * **Learned reward models**: fit a reward model to human preferences between replays (RLHF-style) and show it being gamed in turn.
