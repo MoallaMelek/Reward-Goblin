@@ -228,10 +228,19 @@ The full per-seed table is in [docs/RESULTS.md](docs/RESULTS.md). The scripted r
 
 ```bash
 git clone https://github.com/MoallaMelek/Reward-Goblin.git && cd Reward-Goblin
-python -m venv .venv && . .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-pytest                                             # 55 tests: env checker, rewards, detectors, API, replays
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m pytest
 ```
+
+On Windows PowerShell, replace the activation command above with:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Then run the same `python -m pip` and `python -m pytest` commands from the repository root.
 
 > Windows note: Pymunk's native DLL and git both fail on very long paths. Clone somewhere short (e.g. `C:\src\reward-goblin`).
 
