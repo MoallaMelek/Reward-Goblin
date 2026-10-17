@@ -16,3 +16,14 @@ def test_invalid_utf8_run_is_skipped(tmp_path):
     store = Store(tmp_path)
     assert store.meta("broken") is None
     assert store.list_runs() == []
+
+
+def test_pooled_outscores_reference_rate_uses_only_paired_episodes():
+    from backend.api.store import _pool
+    episodes = [
+        {"return": 10, "reference_return": 5, "exploits": [], "true_success": True},
+        {"return": 1, "reference_return": 5, "exploits": [], "true_success": False},
+        {"return": 100, "exploits": [], "true_success": True},
+    ]
+    assert _pool(episodes)["outscores_reference_rate"] == 0.5
+    assert "outscores_reference_rate" not in _pool(episodes[2:])
