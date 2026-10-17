@@ -15,3 +15,13 @@ def test_steps_must_be_integer(steps):
 def test_integer_hyperparameters_are_not_truncated(key, value):
     with pytest.raises(ValueError, match="must be an integer"):
         normalize_config({"reward": REWARD, "algo": {key: value}})
+
+
+@pytest.mark.parametrize("layers", [None, "64", [], [0], [-1], [True], [64.5], [4097], [64] * 9])
+def test_invalid_network_architecture_rejected_before_worker_start(layers):
+    with pytest.raises(ValueError, match="net_arch"):
+        normalize_config({"reward": REWARD, "algo": {"net_arch": layers}})
+
+
+def test_valid_custom_network_architecture():
+    assert normalize_config({"reward": REWARD, "algo": {"net_arch": [128, 32]}})["algo"]["net_arch"] == [128, 32]
