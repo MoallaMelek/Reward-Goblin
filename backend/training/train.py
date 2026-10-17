@@ -64,10 +64,20 @@ def normalize_config(cfg: dict) -> dict:
             if not isinstance(v, (int, float)) or isinstance(v, bool) or not lo <= v <= hi:
                 raise ValueError(f"{k} must be within [{lo}, {hi}]")
         algo[k] = v
+    net_arch = algo["net_arch"]
+    if (not isinstance(net_arch, list) or not 1 <= len(net_arch) <= 8
+            or any(isinstance(n, bool) or not isinstance(n, int) or not 1 <= n <= 4096 for n in net_arch)):
+        raise ValueError("net_arch must contain 1 to 8 integer layer sizes within [1, 4096]")
     for k in ("n_steps", "batch_size", "n_epochs", "n_envs"):
         if k in algo:
             algo[k] = int(algo[k])
-    steps = int(cfg.get("steps", DEFAULT_STEPS))
+    for k in ("n_steps", "batch_size", "n_epochs", "n_envs"):
+        value = algo_in.get(k)
+        if value is not None and int(value) != value:
+            raise ValueError(f"{k} must be an integer")
+    steps = cfg.get("steps", DEFAULT_STEPS)
+    if isinstance(steps, bool) or not isinstance(steps, int):
+        raise ValueError("steps must be an integer")
     if not 1_000 <= steps <= 3_000_000:
         raise ValueError("steps must be within [1000, 3000000]")
     return {

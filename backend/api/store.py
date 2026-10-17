@@ -10,7 +10,7 @@ import numpy as np
 
 from ..analysis.exploit_detection import LABELS
 
-SAFE_ID = re.compile(r"^[A-Za-z0-9_\-]{1,120}$")
+SAFE_ID = re.compile(r"[A-Za-z0-9_\-]{1,120}\Z")
 
 
 class Store:
@@ -154,6 +154,7 @@ def _pool(eps: list[dict]) -> dict:
     if not eps:
         return {"episodes": 0}
     heads = Counter(e["exploits"][0] for e in eps if e["exploits"])
+    paired = [e for e in eps if e.get("reference_return") is not None]
     return {
         "episodes": len(eps),
         "true_success_rate": float(np.mean([bool(e["true_success"]) for e in eps])),
@@ -161,6 +162,8 @@ def _pool(eps: list[dict]) -> dict:
         "mean_return": float(np.mean([e["return"] for e in eps])),
         "mean_reference_return": float(np.mean([e["reference_return"] for e in eps
                                                 if e.get("reference_return") is not None] or [0.0])),
+        **({"outscores_reference_rate": float(np.mean([e["return"] > e["reference_return"] for e in paired]))}
+           if paired else {}),
         "reference_success_rate": float(np.mean([bool(e.get("reference_success")) for e in eps])),
         "exploit_breakdown": {LABELS.get(k, k): v for k, v in heads.most_common()},
         "dominant_exploit": heads.most_common(1)[0][0] if heads else None,
