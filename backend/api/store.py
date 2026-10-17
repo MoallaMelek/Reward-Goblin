@@ -24,7 +24,7 @@ class Store:
     def _read(self, path: Path):
         try:
             return json.loads(path.read_text())
-        except (OSError, json.JSONDecodeError):
+        except (OSError, UnicodeError, json.JSONDecodeError):
             return None
 
     def run_ids(self) -> list[str]:
