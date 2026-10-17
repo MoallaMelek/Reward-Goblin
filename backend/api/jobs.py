@@ -63,9 +63,13 @@ class JobManager:
             st = _read(self.root / "runs" / rid / "status.json") or {"state": "unknown"}
             fut = self._futures.get(job_id, [None] * len(job["run_ids"]))[i]
             if fut is not None and fut.done():
-                res = fut.result()
-                if isinstance(res, dict) and "error" in res:
-                    st = {**st, "state": "error", "error": res["error"]}
+                try:
+                    res = fut.result()
+                except Exception as exc:
+                    st = {**st, "state": "error", "error": str(exc)}
+                else:
+                    if isinstance(res, dict) and "error" in res:
+                        st = {**st, "state": "error", "error": res["error"]}
             elif fut is None and st.get("state") in ("queued", "training", "evaluating"):
                 st = {**st, "state": "interrupted"}  # server restarted mid-run
             runs.append({"run_id": rid, "seed": job["seeds"][i], **st})
