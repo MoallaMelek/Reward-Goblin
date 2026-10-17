@@ -219,6 +219,8 @@ def validate(d: dict, layout: str | None = None) -> tuple[list[str], list[dict]]
         spec = PARAMS[k]
         if isinstance(v, bool) or not isinstance(v, (int, float)) or not (spec["min"] <= v <= spec["max"]):
             errors.append(f"parameter '{k}' must be a number in [{spec['min']}, {spec['max']}]")
+        elif k == "stable_goal_frames" and not float(v).is_integer():
+            errors.append("parameter 'stable_goal_frames' must be an integer")
     for k, v in term.items():
         if k not in TERMINATION:
             errors.append(f"unknown termination rule '{k}'")
