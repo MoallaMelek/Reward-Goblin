@@ -78,3 +78,10 @@ def test_api_404s(client):
     assert client.get("/api/replays/../x?kind=y").status_code == 404
     assert client.get("/api/experiments/nothing").status_code == 404
     assert client.get("/api/training/nothing").status_code == 404
+
+
+@pytest.mark.parametrize("steps", ["many", None, [], {}, True, 1000.5])
+def test_api_returns_validation_error_for_malformed_steps(client, steps):
+    response = client.post("/api/train", json={"config": {"reward": REWARD, "steps": steps}, "seeds": [1]})
+    assert response.status_code == 422
+    assert client.get("/api/training").json() == []

@@ -158,7 +158,10 @@ def train(body: TrainBody):
         raise HTTPException(422, f"choose between 1 and {MAX_SEEDS} seeds in [0, 1e6)")
     if body.steps is not None:
         cfg["steps"] = body.steps
-    if int(cfg.get("steps", 150_000)) > MAX_API_STEPS:
+    steps = cfg.get("steps", 150_000)
+    if isinstance(steps, bool) or not isinstance(steps, int):
+        raise HTTPException(422, "steps must be an integer")
+    if steps > MAX_API_STEPS:
         raise HTTPException(422, f"steps must be <= {MAX_API_STEPS} from the UI (use train.py for longer runs)")
     cfg.setdefault("steps", 150_000)
     cfg["experiment"] = exp
