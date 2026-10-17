@@ -10,7 +10,7 @@ import numpy as np
 
 from ..analysis.exploit_detection import LABELS
 
-SAFE_ID = re.compile(r"^[A-Za-z0-9_\-]{1,120}$")
+SAFE_ID = re.compile(r"[A-Za-z0-9_\-]{1,120}\Z")
 
 
 class Store:
