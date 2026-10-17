@@ -26,7 +26,7 @@ from ..analysis.true_objective import TRUE_OBJECTIVE, box_inside
 from .physics import (ACTION_NAMES, RAY_COUNT, RAY_RANGE, PhysicsParams, World, box_rect,
                       circle_rect_overlap, rect_center, rect_overlap)
 from .planning import DistanceField, box_grid
-from .randomization import Layout, generate_layout
+from .randomization import DIFFICULTIES, NAMED_LAYOUTS, Layout, generate_layout
 from .rewards import RewardConfig, StepSignals, compute
 
 ENV_VERSION = "reward-goblin-env/1.0"
@@ -51,6 +51,16 @@ class EnvConfig:
         d = dict(d or {})
         known = {k: d[k] for k in ("layout", "randomize", "settle_frames", "diagnostics") if k in d}
         return cls(**known)
+
+    def __post_init__(self):
+        if self.layout not in NAMED_LAYOUTS and self.layout not in DIFFICULTIES:
+            raise ValueError("unknown layout")
+        for name in ("randomize", "diagnostics"):
+            if not isinstance(getattr(self, name), bool):
+                raise ValueError(f"{name} must be true/false")
+        if (isinstance(self.settle_frames, bool) or not isinstance(self.settle_frames, int)
+                or not 1 <= self.settle_frames <= 1000):
+            raise ValueError("settle_frames must be an integer within [1, 1000]")
 
     def to_dict(self) -> dict:
         return asdict(self)

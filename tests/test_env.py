@@ -129,3 +129,14 @@ def test_reference_policy_solves_the_default_map():
             done = term or trunc
         wins += info["episode_diag"]["true_success"]
     assert wins >= 4
+
+
+@pytest.mark.parametrize("config", [
+    {"layout": "missing"}, {"randomize": "false"}, {"diagnostics": 1},
+    {"settle_frames": 0}, {"settle_frames": -1}, {"settle_frames": True},
+    {"settle_frames": 1.5}, {"settle_frames": 1001},
+])
+def test_environment_config_rejects_invalid_inputs(config):
+    from backend.env.reward_goblin_env import EnvConfig
+    with pytest.raises(ValueError):
+        EnvConfig.from_dict(config)
