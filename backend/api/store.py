@@ -23,7 +23,8 @@ class Store:
     # ------------------------------------------------------------------ runs
     def _read(self, path: Path):
         try:
-            return json.loads(path.read_text())
+            data = json.loads(path.read_text(encoding="utf-8"))
+            return data if isinstance(data, dict) else None
         except (OSError, UnicodeError, json.JSONDecodeError):
             return None
 

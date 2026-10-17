@@ -10,7 +10,15 @@ async function request(method, path, body) {
     body: body ? JSON.stringify(body) : undefined,
   });
   const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
+  let data = null;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch (error) {
+      if (res.ok) throw error;
+      throw new Error(`HTTP ${res.status}: ${text.slice(0, 500) || res.statusText}`);
+    }
+  }
   if (!res.ok) {
     const detail = data && data.detail ? (typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail)) : res.statusText;
     throw new Error(detail);
