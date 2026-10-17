@@ -208,7 +208,7 @@ def validate(d: dict, layout: str | None = None) -> tuple[list[str], list[dict]]
         if k not in COMPONENTS:
             errors.append(f"unknown reward component '{k}'")
             continue
-        if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v):
+        if isinstance(v, bool) or not isinstance(v, (int, float)) or (isinstance(v, float) and not math.isfinite(v)):
             errors.append(f"component '{k}' must be a finite number")
         elif abs(v) > WEIGHT_LIMIT:
             errors.append(f"component '{k}' weight must be within ±{WEIGHT_LIMIT:g}")
@@ -226,7 +226,7 @@ def validate(d: dict, layout: str | None = None) -> tuple[list[str], list[dict]]
             errors.append(f"unknown termination rule '{k}'")
         elif k == "max_steps":
             spec = TERMINATION[k]
-            if (isinstance(v, bool) or not isinstance(v, (int, float)) or not float(v).is_integer()
+            if (isinstance(v, bool) or not isinstance(v, (int, float)) or (isinstance(v, float) and not v.is_integer())
                     or not (spec["min"] <= v <= spec["max"])):
                 errors.append(f"max_steps must be an integer in [{spec['min']}, {spec['max']}]")
         elif not isinstance(v, bool):
