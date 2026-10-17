@@ -198,6 +198,11 @@ def validate(d: dict, layout: str | None = None) -> tuple[list[str], list[dict]]
     for k in d:
         if k not in allowed_top and k not in COMPONENTS and k not in PARAMS and k not in TERMINATION:
             errors.append(f"unknown field '{k}'")
+    for field in ("components", "params", "termination"):
+        if field in d and not isinstance(d[field], dict):
+            errors.append(f"{field} must be a JSON object")
+    if errors:
+        return errors, []
     comps, params, term = _split(d)
     for k, v in comps.items():
         if k not in COMPONENTS:
