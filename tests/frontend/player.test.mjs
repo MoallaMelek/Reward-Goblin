@@ -82,3 +82,17 @@ test('timeline navigation prevents page scrolling and supports endpoints', () =>
   assert.deepEqual(seeks, [11, 9, 0, 29]);
   assert.equal(prevented, 4);
 });
+
+test('replay event and detector labels remain text inside timeline tooltips', () => {
+  const player = Object.assign(Object.create(Player.prototype), {
+    n: 2, timeline: {}, rec: {
+      frames: {agent: [[0, 0], [1, 0]]},
+      events: [{type: 'enter', step: 0, text: '\"><img src=x onerror=alert(1)>'}],
+      exploits: [{step: 1, label: '\" onmouseover=\"alert(1)'}],
+    },
+  });
+  player._drawTimeline();
+  assert.doesNotMatch(player.timeline.innerHTML, /<img|title="[^"]*" onmouseover=/);
+  assert.match(player.timeline.innerHTML, /&quot;&gt;&lt;img/);
+  assert.match(player.timeline.innerHTML, /&quot; onmouseover=&quot;/);
+});

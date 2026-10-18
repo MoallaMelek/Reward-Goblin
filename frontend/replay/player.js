@@ -7,6 +7,9 @@ import { goblinLine } from "../components/goblin.js";
 
 export const ACTIONS = ["no-op", "left", "right", "up", "down"];
 const HEADINGS = [null, [-1, 0], [1, 0], [0, 1], [0, -1]];
+const escapeAttribute = (value) => String(value).replace(/[&<>"']/g, (char) => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+})[char]);
 const MARKER = {
   collision: { color: "#9aa9c9", label: "collision" },
   box_bump: null,
@@ -185,10 +188,10 @@ export class Player {
     for (const e of rec.events) {
       const m = MARKER[e.type];
       if (!m) continue;
-      parts.push(`<div class="tl-mark" title="Step ${e.step}: ${e.text}" style="left:${(e.step / n) * 100}%;background:${m.color}"></div>`);
+      parts.push(`<div class="tl-mark" title="${escapeAttribute(`Step ${e.step}: ${e.text}`)}" style="left:${(e.step / n) * 100}%;background:${m.color}"></div>`);
     }
     for (const f of rec.exploits || []) {
-      parts.push(`<div class="tl-mark tl-exploit" title="Step ${f.step}: detector: ${f.label}" style="left:${(f.step / n) * 100}%"></div>`);
+      parts.push(`<div class="tl-mark tl-exploit" title="${escapeAttribute(`Step ${f.step}: detector: ${f.label}`)}" style="left:${(f.step / n) * 100}%"></div>`);
     }
     parts.push('<div class="tl-head"></div>');
     this.timeline.innerHTML = parts.join("");
