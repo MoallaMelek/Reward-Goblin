@@ -168,8 +168,12 @@ export class Player {
     track.addEventListener("lostpointercapture", () => (dragging = false));
     track.tabIndex = 0;
     track.addEventListener("keydown", (ev) => {
+      if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(ev.key)) return;
+      ev.preventDefault();
       if (ev.key === "ArrowRight") this.seek(this.t + (ev.shiftKey ? 15 : 1));
       if (ev.key === "ArrowLeft") this.seek(this.t - (ev.shiftKey ? 15 : 1));
+      if (ev.key === "Home") this.seek(0);
+      if (ev.key === "End") this.seek(this.n - 1);
     });
   }
 

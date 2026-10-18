@@ -68,3 +68,17 @@ test('cancelled pointer gestures cannot keep seeking the replay', () => {
     assert.equal(seeks.length, 1);
   }
 });
+
+test('timeline navigation prevents page scrolling and supports endpoints', () => {
+  const handlers = {}; const seeks = []; let prevented = 0;
+  const player = Object.assign(Object.create(Player.prototype), {
+    timeline: {addEventListener(name, fn) {handlers[name] = fn;}},
+    n: 30, t: 10, seek(t) {seeks.push(t);},
+  });
+  player._bindTimeline();
+  for (const key of ['ArrowRight', 'ArrowLeft', 'Home', 'End', 'Tab']) {
+    handlers.keydown({key, preventDefault() {prevented++;}});
+  }
+  assert.deepEqual(seeks, [11, 9, 0, 29]);
+  assert.equal(prevented, 4);
+});
