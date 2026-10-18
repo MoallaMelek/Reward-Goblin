@@ -38,3 +38,10 @@ test('seek ignores unloaded and non-finite positions', () => {
   for (const position of [NaN, Infinity, -Infinity]) player.seek(position);
   assert.equal(player.t, 0);
 });
+
+test('empty recordings do not start an animation loop', () => {
+  globalThis.requestAnimationFrame = () => {throw Error('empty replay scheduled');};
+  const player = Object.assign(Object.create(Player.prototype), {rec: {}, n: 0, playing: false});
+  player.play();
+  assert.equal(player.playing, false);
+});

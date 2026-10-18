@@ -85,7 +85,7 @@ export class Player {
   }
 
   play() {
-    if (!this.rec || this.playing) return;
+    if (!this.rec || this.playing || this.n < 1) return;
     if (this.t >= this.n - 1) this.t = 0;
     this.playing = true;
     this._last = performance.now();
