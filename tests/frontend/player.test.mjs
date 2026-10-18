@@ -54,3 +54,17 @@ test('pause cancels even a zero animation identifier and releases it', () => {
   assert.deepEqual(cancelled, [0]);
   assert.equal(player._raf, null);
 });
+
+test('cancelled pointer gestures cannot keep seeking the replay', () => {
+  for (const end of ['pointercancel', 'lostpointercapture']) {
+    const handlers = {}; const seeks = [];
+    const player = Object.assign(Object.create(Player.prototype), {
+      timeline: {addEventListener(name, fn) {handlers[name] = fn;}, setPointerCapture() {}, getBoundingClientRect() {return {left: 0, width: 100};}},
+      n: 10, pause() {}, seek(t) {seeks.push(t);},
+    });
+    player._bindTimeline();
+    handlers.pointerdown({clientX: 20, pointerId: 1});
+    handlers[end](); handlers.pointermove({clientX: 80});
+    assert.equal(seeks.length, 1);
+  }
+});

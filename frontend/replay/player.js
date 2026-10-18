@@ -164,6 +164,8 @@ export class Player {
     });
     track.addEventListener("pointermove", (ev) => dragging && seekFromEvent(ev));
     track.addEventListener("pointerup", () => (dragging = false));
+    track.addEventListener("pointercancel", () => (dragging = false));
+    track.addEventListener("lostpointercapture", () => (dragging = false));
     track.tabIndex = 0;
     track.addEventListener("keydown", (ev) => {
       if (ev.key === "ArrowRight") this.seek(this.t + (ev.shiftKey ? 15 : 1));
