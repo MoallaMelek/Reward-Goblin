@@ -72,6 +72,8 @@ export class Player {
   }
 
   load(rec) {
+    this.pause();
+    this._acc = 0;
     this.rec = rec;
     this.ref = rec.reference ? { ...rec.reference, layout: rec.layout, layout_seed: rec.layout_seed } : null;
     this.left.setLayout(rec.layout);

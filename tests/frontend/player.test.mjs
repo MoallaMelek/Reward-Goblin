@@ -16,3 +16,17 @@ test('play is idempotent while a playback loop is active', () => {
   player.play();
   assert.equal(scheduled, 1);
 });
+
+test('loading another replay stops playback and clears fractional progress', () => {
+  let cancelled = null;
+  globalThis.cancelAnimationFrame = (id) => { cancelled = id; };
+  const player = Object.assign(Object.create(Player.prototype), {
+    playing: true, _raf: 7, _acc: .9,
+    left: {setLayout() {}}, right: {setLayout() {}},
+    render() {}, _drawTimeline() {},
+  });
+  player.load({frames: {agent: [[0, 0]]}, layout: {}});
+  assert.equal(player.playing, false);
+  assert.equal(cancelled, 7);
+  assert.equal(player._acc, 0);
+});
