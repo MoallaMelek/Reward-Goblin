@@ -109,7 +109,8 @@ export class Player {
 
   pause() {
     this.playing = false;
-    if (this._raf) cancelAnimationFrame(this._raf);
+    if (this._raf != null) cancelAnimationFrame(this._raf);
+    this._raf = null;
     this.render();
   }
 

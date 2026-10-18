@@ -45,3 +45,12 @@ test('empty recordings do not start an animation loop', () => {
   player.play();
   assert.equal(player.playing, false);
 });
+
+test('pause cancels even a zero animation identifier and releases it', () => {
+  const cancelled = [];
+  globalThis.cancelAnimationFrame = (id) => cancelled.push(id);
+  const player = Object.assign(Object.create(Player.prototype), {_raf: 0, playing: true, render() {}});
+  player.pause(); player.pause();
+  assert.deepEqual(cancelled, [0]);
+  assert.equal(player._raf, null);
+});
