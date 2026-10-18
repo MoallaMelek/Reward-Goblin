@@ -21,7 +21,7 @@ async function request(method, path, body) {
   }
   if (!res.ok) {
     const detail = data && data.detail ? (typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail)) : res.statusText;
-    throw new Error(detail);
+    throw new Error(`HTTP ${res.status}: ${detail}`);
   }
   return data;
 }

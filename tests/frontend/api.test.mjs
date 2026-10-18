@@ -20,3 +20,10 @@ test('successful JSON responses are returned unchanged', async () => {
   globalThis.fetch = async () => ({ok: true, text: async () => '{"limits":{"max_seeds":8}}'});
   assert.deepEqual(await api.meta(), {limits: {max_seeds: 8}});
 });
+
+test('JSON and empty HTTP errors retain their status code', async () => {
+  for (const body of ['{"detail":"invalid seed"}', '']) {
+    globalThis.fetch = async () => ({ok: false, status: 422, statusText: 'Unprocessable Entity', text: async () => body});
+    await assert.rejects(api.meta(), /HTTP 422:/);
+  }
+});
