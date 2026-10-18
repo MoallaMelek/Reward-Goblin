@@ -30,3 +30,11 @@ test('loading another replay stops playback and clears fractional progress', () 
   assert.equal(cancelled, 7);
   assert.equal(player._acc, 0);
 });
+
+test('seek ignores unloaded and non-finite positions', () => {
+  const player = Object.assign(Object.create(Player.prototype), {rec: null, t: 0, render() {throw Error('unexpected draw');}});
+  player.seek(2);
+  player.rec = {}; player.n = 10;
+  for (const position of [NaN, Infinity, -Infinity]) player.seek(position);
+  assert.equal(player.t, 0);
+});
