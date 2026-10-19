@@ -251,7 +251,10 @@ Then run the same `python -m pip` and `python -m pytest` commands from the repos
 python train.py --reward configs/touch_goblin_v2.json --seed 42 --steps 200000
 
 # evaluate a trained model on 100 fresh start states (or another layout suite)
-python evaluate.py --model models/touch_goblin_v2_seed42.zip --episodes 100 [--layout medium]
+python evaluate.py --model models/touch_goblin_v2_seed42.zip --episodes 100
+
+# optionally evaluate on unseen medium layouts
+python evaluate.py --model models/touch_goblin_v2_seed42.zip --episodes 100 --layout medium
 
 # many configs x seeds in parallel worker processes
 python -m backend.training.batch path/to/a.json path/to/b.json --seeds 1 2 3 --steps 300000
