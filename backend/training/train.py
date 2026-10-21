@@ -76,6 +76,7 @@ def normalize_config(cfg: dict) -> dict:
     if (not isinstance(net_arch, list) or not 1 <= len(net_arch) <= 8
             or any(isinstance(n, bool) or not isinstance(n, int) or not 1 <= n <= 4096 for n in net_arch)):
         raise ValueError("net_arch must contain 1 to 8 integer layer sizes within [1, 4096]")
+    algo["net_arch"] = list(net_arch)
     for k in ("n_steps", "batch_size", "n_epochs", "n_envs"):
         if k in algo:
             algo[k] = int(algo[k])
