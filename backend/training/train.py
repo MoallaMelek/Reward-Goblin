@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import platform
+import re
 import subprocess
 import sys
 import time
@@ -50,6 +51,9 @@ def normalize_config(cfg: dict) -> dict:
     """Accept a full experiment config or a bare reward config; fill defaults; validate."""
     if "reward" not in cfg:
         cfg = {"reward": cfg}
+    experiment = cfg.get("experiment", "playground")
+    if not isinstance(experiment, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,80}", experiment):
+        raise ValueError("experiment must be a safe identifier of 1 to 80 characters")
     reward = RewardConfig.from_dict(cfg["reward"])
     env = EnvConfig.from_dict(cfg.get("env"))
     algo_in = dict(cfg.get("algo") or {})
@@ -102,7 +106,7 @@ def normalize_config(cfg: dict) -> dict:
         if isinstance(offset, bool) or not isinstance(offset, int) or offset < 0:
             raise ValueError("evaluation offset must be a nonnegative integer")
     return {
-        "experiment": str(cfg.get("experiment", "playground")),
+        "experiment": experiment,
         "version": int(cfg.get("version", 1)),
         "title": str(cfg.get("title", reward.name)),
         "description": str(cfg.get("description", "")),
@@ -160,6 +164,9 @@ def train_run(cfg: dict, seed: int, *, root: Path = ROOT, run_id: str | None = N
     run_dir.mkdir(parents=True, exist_ok=True)
     (root / "models").mkdir(exist_ok=True)
     seed_everything(seed)
+    experiment = cfg.get("experiment", "playground")
+    if not isinstance(experiment, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,80}", experiment):
+        raise ValueError("experiment must be a safe identifier of 1 to 80 characters")
     reward = RewardConfig.from_dict(cfg["reward"])
     env_cfg = EnvConfig.from_dict(cfg["env"])
     algo = cfg["algo"]
