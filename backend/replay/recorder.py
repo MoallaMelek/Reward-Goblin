@@ -59,8 +59,8 @@ def _frames(trace: dict, keys: list[str]) -> dict:
 
 def save_recording(rec: dict, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(rec, separators=(",", ":")))
+    path.write_text(json.dumps(rec, separators=(",", ":")), encoding="utf-8")
 
 
 def load_recording(path: Path) -> dict:
-    return json.loads(path.read_text())
+    return json.loads(path.read_text(encoding="utf-8"))
