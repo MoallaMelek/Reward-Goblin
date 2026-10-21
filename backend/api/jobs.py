@@ -57,7 +57,12 @@ class JobManager:
         path = self.jobs_dir / f"{job_id}.json"
         if not path.exists() or "/" in job_id or "\\" in job_id:
             return None
-        job = json.loads(path.read_text())
+        job = _read(path)
+        if (not isinstance(job, dict) or not isinstance(job.get("run_ids"), list)
+                or not isinstance(job.get("seeds"), list)
+                or len(job["run_ids"]) != len(job["seeds"])
+                or not job["run_ids"] or not isinstance(job.get("steps"), int)):
+            return None
         runs = []
         for i, rid in enumerate(job["run_ids"]):
             st = _read(self.root / "runs" / rid / "status.json") or {"state": "unknown"}
@@ -107,6 +112,7 @@ class JobManager:
 
 def _read(path: Path):
     try:
-        return json.loads(path.read_text())
-    except (OSError, json.JSONDecodeError):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else None
+    except (OSError, UnicodeError, json.JSONDecodeError):
         return None

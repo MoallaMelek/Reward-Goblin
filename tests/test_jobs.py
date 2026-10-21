@@ -14,3 +14,12 @@ def test_worker_future_failure_is_visible_as_job_error(tmp_path):
     result = jobs.get("failed")
     assert result["state"] == "error"
     assert result["runs"][0]["error"] == "worker process stopped"
+
+
+def test_corrupt_jobs_do_not_break_training_list(tmp_path):
+    jobs = JobManager(tmp_path)
+    for i, raw in enumerate([b"{", b"\xff", b"[]", b"{}", b'{"run_ids":["run"],"seeds":[],"steps":1000}']):
+        (jobs.jobs_dir / f"bad{i}.json").write_bytes(raw)
+    valid = {"job_id": "valid", "run_ids": ["run"], "seeds": [1], "steps": 1000}
+    (jobs.jobs_dir / "valid.json").write_text(json.dumps(valid), encoding="utf-8")
+    assert [j["job_id"] for j in jobs.list()] == ["valid"]
