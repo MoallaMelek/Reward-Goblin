@@ -60,7 +60,7 @@ class Store:
 
     def recording_kinds(self, run_id: str) -> list[str]:
         d = self.rec_dir / run_id
-        return sorted(p.stem for p in d.glob("*.json")) if SAFE_ID.match(run_id) and d.exists() else []
+        return sorted(p.stem for p in d.glob("*.json") if p.is_file() and SAFE_ID.fullmatch(p.stem)) if SAFE_ID.match(run_id) and d.exists() else []
 
     def list_runs(self, experiment: str | None = None) -> list[dict]:
         out = []
