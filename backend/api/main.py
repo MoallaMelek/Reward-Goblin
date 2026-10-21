@@ -14,7 +14,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StrictInt
 
 from ..analysis.exploit_detection import LABELS
 from ..analysis.metrics import summarize
@@ -60,14 +60,14 @@ class RewardBody(BaseModel):
 
 class TrainBody(BaseModel):
     config: dict
-    seeds: list[int] = Field(default_factory=lambda: [1, 2, 3])
-    steps: int | None = None
+    seeds: list[StrictInt] = Field(default_factory=lambda: [1, 2, 3])
+    steps: StrictInt | None = None
 
 
 class EvalBody(BaseModel):
     run_id: str
     layout: str | None = None
-    episodes: int = 20
+    episodes: StrictInt = Field(default=20, ge=1, le=50)
 
 
 @app.get("/api/meta")

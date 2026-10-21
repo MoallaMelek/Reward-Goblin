@@ -25,3 +25,18 @@ def test_invalid_network_architecture_rejected_before_worker_start(layers):
 
 def test_valid_custom_network_architecture():
     assert normalize_config({"reward": REWARD, "algo": {"net_arch": [128, 32]}})["algo"]["net_arch"] == [128, 32]
+
+
+@pytest.mark.parametrize("field,value", [("steps", True), ("steps", "1000"), ("seeds", [True]), ("seeds", ["2"])])
+def test_training_request_does_not_coerce_counts(field, value):
+    from backend.api.main import TrainBody
+    from pydantic import ValidationError
+    with pytest.raises(ValidationError):
+        TrainBody.model_validate({"config": {}, field: value})
+
+@pytest.mark.parametrize("episodes", [True, "3", 0, 51])
+def test_evaluation_request_rejects_invalid_episode_counts(episodes):
+    from backend.api.main import EvalBody
+    from pydantic import ValidationError
+    with pytest.raises(ValidationError):
+        EvalBody(run_id="run", episodes=episodes)
