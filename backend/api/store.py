@@ -160,11 +160,12 @@ def _pool(eps: list[dict]) -> dict:
         "true_success_rate": float(np.mean([bool(e["true_success"]) for e in eps])),
         "exploit_rate": float(np.mean([bool(e["exploits"]) for e in eps])),
         "mean_return": float(np.mean([e["return"] for e in eps])),
-        "mean_reference_return": float(np.mean([e["reference_return"] for e in eps
-                                                if e.get("reference_return") is not None] or [0.0])),
+        "mean_reference_return": float(np.mean([e["reference_return"] for e in paired])) if paired else None,
         **({"outscores_reference_rate": float(np.mean([e["return"] > e["reference_return"] for e in paired]))}
            if paired else {}),
-        "reference_success_rate": float(np.mean([bool(e.get("reference_success")) for e in eps])),
+        "reference_success_rate": (float(np.mean([bool(e["reference_success"]) for e in eps
+                                                   if e.get("reference_success") is not None]))
+                                   if any(e.get("reference_success") is not None for e in eps) else None),
         "exploit_breakdown": {LABELS.get(k, k): v for k, v in heads.most_common()},
         "dominant_exploit": heads.most_common(1)[0][0] if heads else None,
     }

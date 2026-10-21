@@ -27,3 +27,13 @@ def test_pooled_outscores_reference_rate_uses_only_paired_episodes():
     ]
     assert _pool(episodes)["outscores_reference_rate"] == 0.5
     assert "outscores_reference_rate" not in _pool(episodes[2:])
+
+
+def test_missing_reference_measurements_are_not_failures_or_zero_returns():
+    from backend.api.store import _pool
+    base = {"return": 2, "true_success": True, "exploits": []}
+    assert _pool([base])["mean_reference_return"] is None
+    assert _pool([base])["reference_success_rate"] is None
+    result = _pool([base, {**base, "reference_return": 0, "reference_success": True}])
+    assert result["mean_reference_return"] == 0
+    assert result["reference_success_rate"] == 1
