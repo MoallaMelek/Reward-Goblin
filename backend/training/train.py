@@ -54,6 +54,9 @@ def normalize_config(cfg: dict) -> dict:
     experiment = cfg.get("experiment", "playground")
     if not isinstance(experiment, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,80}", experiment):
         raise ValueError("experiment must be a safe identifier of 1 to 80 characters")
+    version = cfg.get("version", 1)
+    if isinstance(version, bool) or not isinstance(version, int) or version < 1:
+        raise ValueError("version must be a positive integer")
     reward = RewardConfig.from_dict(cfg["reward"])
     env = EnvConfig.from_dict(cfg.get("env"))
     algo_in = dict(cfg.get("algo") or {})
@@ -107,7 +110,7 @@ def normalize_config(cfg: dict) -> dict:
             raise ValueError("evaluation offset must be a nonnegative integer")
     return {
         "experiment": experiment,
-        "version": int(cfg.get("version", 1)),
+        "version": version,
         "title": str(cfg.get("title", reward.name)),
         "description": str(cfg.get("description", "")),
         "reward": reward.to_dict(),
@@ -167,6 +170,9 @@ def train_run(cfg: dict, seed: int, *, root: Path = ROOT, run_id: str | None = N
     experiment = cfg.get("experiment", "playground")
     if not isinstance(experiment, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,80}", experiment):
         raise ValueError("experiment must be a safe identifier of 1 to 80 characters")
+    version = cfg.get("version", 1)
+    if isinstance(version, bool) or not isinstance(version, int) or version < 1:
+        raise ValueError("version must be a positive integer")
     reward = RewardConfig.from_dict(cfg["reward"])
     env_cfg = EnvConfig.from_dict(cfg["env"])
     algo = cfg["algo"]
