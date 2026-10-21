@@ -105,7 +105,7 @@ export class Player {
       }
       this.render(now / 1000);
       if (this.playing) this._raf = requestAnimationFrame(tick);
-      else this.onFrame && this.onFrame(this.t, this);
+      else this._raf = null;
     };
     this._raf = requestAnimationFrame(tick);
   }

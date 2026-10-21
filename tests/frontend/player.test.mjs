@@ -96,3 +96,17 @@ test('replay event and detector labels remain text inside timeline tooltips', ()
   assert.match(player.timeline.innerHTML, /&quot;&gt;&lt;img/);
   assert.match(player.timeline.innerHTML, /&quot; onmouseover=&quot;/);
 });
+
+
+test('playback completion reports the final frame once and releases its handle', () => {
+  let tick; const frames = [];
+  globalThis.requestAnimationFrame = (fn) => {tick = fn; return 4;};
+  const player = Object.assign(Object.create(Player.prototype), {
+    rec: {}, t: 0, n: 2, playing: false, _acc: 0, speed: 1,
+    render() {frames.push(this.t);}, onFrame() {throw Error('duplicate incomplete callback');},
+  });
+  player.play(); tick(player._last + 1000);
+  assert.deepEqual(frames, [1]);
+  assert.equal(player.playing, false);
+  assert.equal(player._raf, null);
+});
