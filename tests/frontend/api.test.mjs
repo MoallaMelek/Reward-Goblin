@@ -27,3 +27,16 @@ test('JSON and empty HTTP errors retain their status code', async () => {
     await assert.rejects(api.meta(), /HTTP 422:/);
   }
 });
+
+
+test('static demo never claims uncomputed rewards passed validation', async () => {
+  globalThis.window = {REWARD_GOBLIN_STATIC: true};
+  globalThis.fetch = async () => ({ok: true, text: async () => '{"known":{"ok":true}}'});
+  const {api: snapshot} = await import(`data:text/javascript,${encodeURIComponent(source + '\n// static')}`);
+  assert.equal((await snapshot.validate({}, 'known')).ok, true);
+  for (const key of [null, 'changed', '__proto__', 'constructor']) {
+    const result = await snapshot.validate({}, key);
+    assert.equal(result.ok, false);
+    assert.equal(result.offline, true);
+  }
+});

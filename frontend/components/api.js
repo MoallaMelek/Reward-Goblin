@@ -54,7 +54,9 @@ const snapshot = {
   // Lint was precomputed for the gallery rewards; edited rewards need the backend.
   validate: async (reward, fingerprint) => {
     lintCache = lintCache || (await request("GET", "api/lint.json"));
-    return lintCache[fingerprint] || { ok: true, errors: [], warnings: [], offline: true };
+    return (Object.hasOwn(lintCache, fingerprint) && lintCache[fingerprint]) || {
+      ok: false, errors: [], warnings: ["Reward validation is unavailable in the static demo."], offline: true,
+    };
   },
   train: offline, job: offline, jobMetrics: offline, jobs: async () => [], evaluate: offline,
 };
