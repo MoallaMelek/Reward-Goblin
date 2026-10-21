@@ -31,7 +31,7 @@ class Store:
     def run_ids(self) -> list[str]:
         if not self.runs_dir.exists():
             return []
-        return sorted(p.name for p in self.runs_dir.iterdir() if p.is_dir() and not p.name.startswith("_"))
+        return sorted(p.name for p in self.runs_dir.iterdir() if p.is_dir() and SAFE_ID.fullmatch(p.name) and not p.name.startswith("_"))
 
     def meta(self, run_id: str) -> dict | None:
         if not SAFE_ID.match(run_id):
