@@ -40,3 +40,15 @@ def test_evaluation_request_rejects_invalid_episode_counts(episodes):
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
         EvalBody(run_id="run", episodes=episodes)
+
+
+@pytest.mark.parametrize('suites',[[],{},[None],[{'name':'x','layout':'arena','episodes':0}],[{'name':'x','layout':'arena','episodes':True}],[{'name':'x','layout':'unknown','episodes':2}],[{'name':'x','layout':'arena','episodes':2,'offset':-1}],[{'name':'x','layout':'arena','episodes':2}]*2])
+def test_invalid_evaluation_plan_is_rejected_before_training(suites):
+    with pytest.raises(ValueError):normalize_config({'reward':REWARD,'eval':suites})
+
+def test_custom_evaluation_plan_is_preserved_without_aliasing():
+    suites=[{'name':'held_out','layout':'medium','episodes':10,'offset':5000}]
+    normalized=normalize_config({'reward':REWARD,'eval':suites})
+    assert normalized['eval']==suites
+    normalized['eval'][0]['episodes']=2
+    assert suites[0]['episodes']==10

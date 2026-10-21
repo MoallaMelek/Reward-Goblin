@@ -22,6 +22,7 @@ from pathlib import Path
 
 from ..analysis.metrics import classify_run, summarize
 from ..env.reward_goblin_env import ENV_VERSION, EnvConfig, RewardGoblinEnv
+from ..env.randomization import DIFFICULTIES, NAMED_LAYOUTS
 from ..env.rewards import RewardConfig
 from ..replay.recorder import build_recording, save_recording
 from .callbacks import MetricsCallback, write_json_atomic
@@ -80,6 +81,26 @@ def normalize_config(cfg: dict) -> dict:
         raise ValueError("steps must be an integer")
     if not 1_000 <= steps <= 3_000_000:
         raise ValueError("steps must be within [1000, 3000000]")
+    suites = cfg.get("eval")
+    if suites is None:
+        suites = default_eval_suites(env.layout)
+    if not isinstance(suites, list) or not suites:
+        raise ValueError("eval must contain at least one evaluation suite")
+    names = set()
+    for suite in suites:
+        if not isinstance(suite, dict):
+            raise ValueError("each evaluation suite must be an object")
+        name = suite.get("name")
+        if not isinstance(name, str) or not name.strip() or name in names:
+            raise ValueError("evaluation suite names must be nonblank and unique")
+        names.add(name)
+        if suite.get("layout") not in (*NAMED_LAYOUTS, *DIFFICULTIES):
+            raise ValueError("unknown evaluation layout")
+        episodes, offset = suite.get("episodes"), suite.get("offset", 0)
+        if isinstance(episodes, bool) or not isinstance(episodes, int) or episodes < 1:
+            raise ValueError("evaluation episodes must be a positive integer")
+        if isinstance(offset, bool) or not isinstance(offset, int) or offset < 0:
+            raise ValueError("evaluation offset must be a nonnegative integer")
     return {
         "experiment": str(cfg.get("experiment", "playground")),
         "version": int(cfg.get("version", 1)),
@@ -89,7 +110,7 @@ def normalize_config(cfg: dict) -> dict:
         "env": env.to_dict(),
         "algo": algo,
         "steps": steps,
-        "eval": cfg.get("eval") or default_eval_suites(env.layout),
+        "eval": [dict(suite) for suite in suites],
     }
 
 
