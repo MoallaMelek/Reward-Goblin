@@ -110,3 +110,14 @@ test('playback completion reports the final frame once and releases its handle',
   assert.equal(player.playing, false);
   assert.equal(player._raf, null);
 });
+
+
+test('seeking during playback resets elapsed time and fractional frame debt', () => {
+  const player = Object.assign(Object.create(Player.prototype), {
+    rec: {}, n: 100, t: 4, _acc: .99, _last: 0, render() {},
+  });
+  player.seek(40);
+  assert.equal(player.t, 40);
+  assert.equal(player._acc, 0);
+  assert.ok(player._last > 0);
+});

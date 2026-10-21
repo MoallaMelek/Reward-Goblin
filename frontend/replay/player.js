@@ -125,6 +125,8 @@ export class Player {
   seek(t) {
     if (!this.rec || !Number.isFinite(t) || !Number.isFinite(this.n) || this.n < 1) return;
     this.t = Math.max(0, Math.min(this.n - 1, Math.round(t)));
+    this._acc = 0;
+    this._last = performance.now();
     this.render();
   }
 
